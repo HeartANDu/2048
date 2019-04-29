@@ -6,6 +6,10 @@ from PyQt5 import QtCore
 from field import Field
 
 
+END_OVERLAY_STYLE = 'background-color: rgba(255, 255, 255, 0.7); ' \
+                    'font-size: 30pt; font-weight: bold; color: #776e65;'
+
+
 class Window(QWidget):
     def __init__(self):
         super().__init__()
@@ -23,12 +27,28 @@ class Window(QWidget):
         background.setObjectName('background')
         background.raise_()
 
+        self.win_label = QLabel(self)
+        self.win_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
+        self.win_label.setStyleSheet(END_OVERLAY_STYLE)
+        self.win_label.setText('You won!\nCongratulations!')
+        self.win_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.win_label.hide()
+
+        self.fail_label = QLabel(self)
+        self.fail_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
+        self.fail_label.setStyleSheet(END_OVERLAY_STYLE)
+        self.fail_label.setText('You lost.\nTry again.')
+        self.fail_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.fail_label.hide()
+
         self.field = Field(self)
         self.setLayout(self.field)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             sys.exit(0)
+        elif event.key() == QtCore.Qt.Key_R:
+            self.reset()
         if not self.win and not self.fail:
             if event.key() == QtCore.Qt.Key_Up:
                 self.field.move_up()
@@ -50,19 +70,16 @@ class Window(QWidget):
             self.show_fail_message()
 
     def show_win_message(self):
-        win_label = QLabel(self)
-        win_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
-        win_label.setStyleSheet('background-color: rgba(255, 255, 255, 0.7);')
-        win_label.setText('You won! Congratulations!')
-        win_label.setAlignment(QtCore.Qt.AlignCenter)
-        win_label.show()
-        win_label.raise_()
+        self.win_label.show()
+        self.win_label.raise_()
 
     def show_fail_message(self):
-        fail_label = QLabel(self)
-        fail_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
-        fail_label.setStyleSheet('background-color: rgba(255, 255, 255, 0.7);')
-        fail_label.setText('You lost. Try again.')
-        fail_label.setAlignment(QtCore.Qt.AlignCenter)
-        fail_label.show()
-        fail_label.raise_()
+        self.fail_label.show()
+        self.fail_label.raise_()
+
+    def reset(self):
+        self.win = False
+        self.fail = False
+        self.win_label.hide()
+        self.fail_label.hide()
+        self.field.reset()

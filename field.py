@@ -41,7 +41,7 @@ class Block(QLabel):
 class Field(QGridLayout):
     def __init__(self, parent):
         super().__init__(parent)
-        self.blocks = [[Block() for j in range(4)] for i in range(4)]
+        self.blocks = self.make_blocks()
         self.full = False
         self.init_layout()
         self.init_blocks()
@@ -54,6 +54,14 @@ class Field(QGridLayout):
         self.assign_blocks()
         for i in range(2):
             self.blocks[randrange(4)][randrange(4)].init_value()
+
+    def make_blocks(self):
+        return [[Block() for j in range(4)] for i in range(4)]
+
+    def reset(self):
+        self.blocks = self.make_blocks()
+        self.full = False
+        self.init_blocks()
 
     def assign_blocks(self):
         positions = [(i, j) for i in range(4) for j in range(4)]

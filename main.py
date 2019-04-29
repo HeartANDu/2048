@@ -11,7 +11,8 @@ def main():
     sys.exit(app.exec_())
 
 
-# TODO make restart
+# TODO make scoreboard
+# TODO make clickable menu
 # TODO make unlimited mode
 # TODO make some visual adjustments
 # TODO add undo
