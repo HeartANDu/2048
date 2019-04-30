@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow
 from PyQt5 import QtCore
 
 from field import Field
@@ -10,7 +10,7 @@ END_OVERLAY_STYLE = 'background-color: rgba(255, 255, 255, 0.7); ' \
                     'font-size: 30pt; font-weight: bold; color: #776e65;'
 
 
-class Window(QWidget):
+class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.win = False
@@ -18,31 +18,32 @@ class Window(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.resize(500, 500)
+        self.setFixedSize(500, 500)
         self.setWindowTitle('2048')
-        background = QLabel(self)
-        background.setGeometry(QtCore.QRect(10, 10, 480, 480))
+        central = QWidget(self)
+        self.setCentralWidget(central)
+        background = QWidget(central)
         background.setStyleSheet('background-color: rgb(187, 173, 160);')
-        background.setText('')
-        background.setObjectName('background')
+        background.setGeometry(10, 10, 480, 480)
         background.raise_()
 
-        self.win_label = QLabel(self)
-        self.win_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
+        self.win_label = QLabel(central)
+        self.win_label.resize(500, 500)
         self.win_label.setStyleSheet(END_OVERLAY_STYLE)
         self.win_label.setText('You won!\nCongratulations!')
         self.win_label.setAlignment(QtCore.Qt.AlignCenter)
         self.win_label.hide()
 
-        self.fail_label = QLabel(self)
-        self.fail_label.setGeometry(QtCore.QRect(10, 10, 480, 480))
+        self.fail_label = QLabel(central)
+        self.fail_label.resize(500, 500)
         self.fail_label.setStyleSheet(END_OVERLAY_STYLE)
         self.fail_label.setText('You lost.\nTry again.')
         self.fail_label.setAlignment(QtCore.Qt.AlignCenter)
         self.fail_label.hide()
 
         self.field = Field(self)
-        self.setLayout(self.field)
+        background.setLayout(self.field)
+
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:

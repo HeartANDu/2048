@@ -47,7 +47,8 @@ class Field(QGridLayout):
         self.init_blocks()
 
     def init_layout(self):
-        self.setContentsMargins(20, 20, 20, 20)
+        self.setGeometry(QtCore.QRect(40, 40, 420, 420))
+        self.setContentsMargins(10, 10, 10, 10)
         self.setSpacing(10)
 
     def init_blocks(self):

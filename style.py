@@ -15,7 +15,7 @@ class Style:
             2048: 'background-color: #edc22e; color: #f9f6f2;',
             'big': 'background-color: #3e3933; color: #f9f6f2;',
         }
-        self.additional = 'font-size: 28pt; font-weight: bold;'
+        self.additional = 'font-size: 28pt; font-weight: bold; border-radius: 5px;'
 
     def get_style(self, value: int):
         key = value
