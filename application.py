@@ -21,8 +21,10 @@ class Window(QMainWindow):
         self.setFixedSize(500, 500)
         self.setWindowTitle('2048')
         central = QWidget(self)
+        central.setObjectName('central')
         self.setCentralWidget(central)
         background = QWidget(central)
+        background.setObjectName('background')
         background.setStyleSheet('background-color: rgb(187, 173, 160);')
         background.setGeometry(10, 10, 480, 480)
         background.raise_()
@@ -44,7 +46,6 @@ class Window(QMainWindow):
         self.field = Field(self)
         background.setLayout(self.field)
 
-
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             sys.exit(0)
@@ -59,6 +60,8 @@ class Window(QMainWindow):
                 self.field.move_right()
             elif event.key() == QtCore.Qt.Key_Left:
                 self.field.move_left()
+            elif event.key() == QtCore.Qt.Key_U:
+                self.field.undo()
             self.check_ending()
         event.accept()
 

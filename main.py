@@ -15,6 +15,8 @@ def main():
 # TODO make clickable menu
 # TODO make unlimited mode
 # TODO make some visual adjustments
-# TODO add undo
+# TODO make settings
+# TODO maybe animations?
+# TODO debug mode
 if __name__ == '__main__':
     main()
