@@ -9,6 +9,7 @@ from application import MainWindow
 # TODO make settings
 # TODO maybe animations?
 # TODO debug mode
+# FIXME do not remember state when no changes made
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

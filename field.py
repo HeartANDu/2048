@@ -85,6 +85,10 @@ class Field(QGridLayout):
         self.init_blocks()
 
     def assign_blocks(self):
+        while self.count():
+            child = self.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
         for i, j in list(product(range(FIELD_SIZE), range(FIELD_SIZE))):
             self.addWidget(self.blocks[i][j].make_label(), i, j)
 
