@@ -1,50 +1,26 @@
 import sys
 
-from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow
+from PyQt5.QtWidgets import QMainWindow, qApp
 from PyQt5 import QtCore
 
-from field import Field
+from ui import UiMainWindow
 
 
-END_OVERLAY_STYLE = 'background-color: rgba(255, 255, 255, 0.7); ' \
-                    'font-size: 30pt; font-weight: bold; color: #776e65;'
-
-
-class Window(QMainWindow):
+class MainWindow(QMainWindow, UiMainWindow):
     def __init__(self):
         super().__init__()
         self.win = False
         self.fail = False
-        self.init_ui()
+        self.init_ui(self)
+        qApp.installEventFilter(self)
+        self.undo_button.clicked.connect(self.undo)
+        self.reset_button.clicked.connect(self.reset)
 
-    def init_ui(self):
-        self.setFixedSize(500, 500)
-        self.setWindowTitle('2048')
-        central = QWidget(self)
-        central.setObjectName('central')
-        self.setCentralWidget(central)
-        background = QWidget(central)
-        background.setObjectName('background')
-        background.setStyleSheet('background-color: rgb(187, 173, 160);')
-        background.setGeometry(10, 10, 480, 480)
-        background.raise_()
-
-        self.win_label = QLabel(central)
-        self.win_label.resize(500, 500)
-        self.win_label.setStyleSheet(END_OVERLAY_STYLE)
-        self.win_label.setText('You won!\nCongratulations!')
-        self.win_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.win_label.hide()
-
-        self.fail_label = QLabel(central)
-        self.fail_label.resize(500, 500)
-        self.fail_label.setStyleSheet(END_OVERLAY_STYLE)
-        self.fail_label.setText('You lost.\nTry again.')
-        self.fail_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.fail_label.hide()
-
-        self.field = Field(self)
-        background.setLayout(self.field)
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            self.keyPressEvent(event)
+            return True
+        return super(MainWindow, self).eventFilter(source, event)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
@@ -61,7 +37,8 @@ class Window(QMainWindow):
             elif event.key() == QtCore.Qt.Key_Left:
                 self.field.move_left()
             elif event.key() == QtCore.Qt.Key_U:
-                self.field.undo()
+                self.undo()
+            self.update_score()
             self.check_ending()
         event.accept()
 
@@ -72,6 +49,9 @@ class Window(QMainWindow):
         if self.field.full:
             self.fail = True
             self.show_fail_message()
+
+    def update_score(self):
+        self.score.update_score(self.field.score)
 
     def show_win_message(self):
         self.win_label.show()
@@ -87,3 +67,6 @@ class Window(QMainWindow):
         self.win_label.hide()
         self.fail_label.hide()
         self.field.reset()
+
+    def undo(self):
+        self.field.undo()

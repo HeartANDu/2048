@@ -1,22 +1,16 @@
-from PyQt5 import QtWidgets
-
 import sys
-import application
+
+from PyQt5.QtWidgets import QApplication
+from application import MainWindow
 
 
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-    window = application.Window()
-    window.show()
-    sys.exit(app.exec_())
-
-
-# TODO make scoreboard
-# TODO make clickable menu
+# TODO make clickable menu (buttons implemented)
 # TODO make unlimited mode
-# TODO make some visual adjustments
 # TODO make settings
 # TODO maybe animations?
 # TODO debug mode
 if __name__ == '__main__':
-    main()
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

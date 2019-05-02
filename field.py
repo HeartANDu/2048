@@ -5,7 +5,7 @@ from itertools import product
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QLabel, QGridLayout
 
-from style import style
+from ui.style import get_block_style
 from utils import make_matrix
 
 
@@ -21,7 +21,7 @@ class Block:
     def make_label(self) -> QLabel:
         label = QLabel()
         label.setAutoFillBackground(False)
-        label.setStyleSheet(style.get_style(self.value))
+        label.setStyleSheet(get_block_style(self.value))
         label.setText(str(self.value) if self.value > 0 else "")
         label.setScaledContents(False)
         label.setAlignment(QtCore.Qt.AlignCenter)
@@ -57,6 +57,8 @@ class Field(QGridLayout):
         super().__init__(parent)
         self.blocks = make_matrix(FIELD_SIZE, Block)
         self.previous_blocks = make_matrix(FIELD_SIZE)
+        self.score = 0
+        self.previous_score = 0
         self.full = False
         self.is_undone = True
         self.init_layout()
@@ -75,7 +77,11 @@ class Field(QGridLayout):
 
     def reset(self):
         self.blocks = make_matrix(FIELD_SIZE, Block)
+        self.previous_blocks = make_matrix(FIELD_SIZE)
+        self.score = 0
+        self.previous_score = 0
         self.full = False
+        self.is_undone = True
         self.init_blocks()
 
     def assign_blocks(self):
@@ -104,6 +110,7 @@ class Field(QGridLayout):
                             self.blocks[i][j] != 0:
                         self.blocks[i][j].add_value_from(self.blocks[i][k])
                         self.blocks[i][k].set_value(0)
+                        self.score += self.blocks[i][j].value
                         changed = True
                         break
                     elif self.blocks[i][k] != 0:
@@ -158,10 +165,12 @@ class Field(QGridLayout):
 
     def remember_state(self):
         self.previous_blocks = deepcopy(self.blocks)
+        self.previous_score = self.score
         self.is_undone = False
 
     def undo(self):
         if not self.is_undone:
             self.blocks = self.previous_blocks
+            self.score = self.previous_score
             self.is_undone = True
             self.assign_blocks()
