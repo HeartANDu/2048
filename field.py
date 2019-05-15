@@ -57,10 +57,13 @@ class Field(QGridLayout):
         super().__init__(parent)
         self.blocks = make_matrix(FIELD_SIZE, Block)
         self.previous_blocks = make_matrix(FIELD_SIZE)
+        self.buffered_blocks = make_matrix(FIELD_SIZE)
         self.score = 0
         self.previous_score = 0
+        self.buffered_score = 0
         self.full = False
         self.is_undone = True
+        self.is_changed = False
         self.init_layout()
         self.init_blocks()
 
@@ -92,12 +95,12 @@ class Field(QGridLayout):
         for i, j in list(product(range(FIELD_SIZE), range(FIELD_SIZE))):
             self.addWidget(self.blocks[i][j].make_label(), i, j)
 
-    def add_block(self, is_changed: bool):
+    def add_block(self):
         flat_list = [block for row in self.blocks for block in row]
         blocks = list(filter(lambda block: block == 0, flat_list))
         if len(blocks) == 0:
             self.full = True
-        elif is_changed:
+        elif self.is_changed:
             blocks[randrange(len(blocks))].init_value()
 
     def check_for_2048_block(self) -> bool:
@@ -106,7 +109,7 @@ class Field(QGridLayout):
         return bool(result)
 
     def move(self):
-        changed = False
+        self.is_changed = False
         for i in range(FIELD_SIZE):
             for j in range(FIELD_SIZE - 1):
                 for k in range(j + 1, FIELD_SIZE):
@@ -115,7 +118,7 @@ class Field(QGridLayout):
                         self.blocks[i][j].add_value_from(self.blocks[i][k])
                         self.blocks[i][k].set_value(0)
                         self.score += self.blocks[i][j].value
-                        changed = True
+                        self.is_changed = True
                         break
                     elif self.blocks[i][k] != 0:
                         break
@@ -125,40 +128,44 @@ class Field(QGridLayout):
                         if self.blocks[i][k] != 0:
                             self.blocks[i][j], self.blocks[i][k] = \
                                 self.blocks[i][k], self.blocks[i][j]
-                            changed = True
+                            self.is_changed = True
                             break
-        self.add_block(changed)
+        self.add_block()
 
     def move_left(self):
-        self.remember_state()
+        self.buffer_current_state()
         self.move()
+        self.remember_state()
         self.assign_blocks()
 
     def move_right(self):
-        self.remember_state()
+        self.buffer_current_state()
         self.rotate_field()
         self.rotate_field()
         self.move()
         self.rotate_field()
         self.rotate_field()
+        self.remember_state()
         self.assign_blocks()
 
     def move_up(self):
-        self.remember_state()
+        self.buffer_current_state()
         self.rotate_field()
         self.rotate_field()
         self.rotate_field()
         self.move()
         self.rotate_field()
+        self.remember_state()
         self.assign_blocks()
 
     def move_down(self):
-        self.remember_state()
+        self.buffer_current_state()
         self.rotate_field()
         self.move()
         self.rotate_field()
         self.rotate_field()
         self.rotate_field()
+        self.remember_state()
         self.assign_blocks()
 
     def rotate_field(self):
@@ -168,9 +175,14 @@ class Field(QGridLayout):
         self.blocks = blocks
 
     def remember_state(self):
-        self.previous_blocks = deepcopy(self.blocks)
-        self.previous_score = self.score
-        self.is_undone = False
+        if self.is_changed:
+            self.previous_blocks = deepcopy(self.buffered_blocks)
+            self.previous_score = self.buffered_score
+            self.is_undone = False
+
+    def buffer_current_state(self):
+        self.buffered_blocks = deepcopy(self.blocks)
+        self.buffered_score = self.score
 
     def undo(self):
         if not self.is_undone:

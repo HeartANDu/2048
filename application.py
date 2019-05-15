@@ -37,7 +37,7 @@ class MainWindow(QMainWindow, UiMainWindow):
             elif event.key() == QtCore.Qt.Key_Left:
                 self.field.move_left()
             elif event.key() == QtCore.Qt.Key_U:
-                self.undo()
+                self.undo(is_key=True)
             self.update_score()
             self.check_ending()
         event.accept()
@@ -68,5 +68,9 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.fail_label.hide()
         self.field.reset()
 
-    def undo(self):
+    def undo(self, **kwargs):
+        is_key = False if 'is_key' not in kwargs else kwargs['is_key']
         self.field.undo()
+        if not is_key:
+            self.update_score()
+            self.check_ending()
